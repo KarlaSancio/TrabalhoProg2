@@ -31,7 +31,7 @@ typedef struct
 int main(){
 
 
-    FILE*fl=fopen("covid19ES.csv","rt");
+    FILE*fl=fopen("covid19ES.csv","r");
 
         if(fl==NULL){
             printf("ERRO NA LEITURA DE ARQUIVO!");
