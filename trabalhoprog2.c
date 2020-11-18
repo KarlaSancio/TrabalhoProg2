@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct Dados
+typedef struct 
 {
     //datas com 10 vetores para padrao de data;
     char DataCadastro[10];
@@ -26,6 +26,8 @@ typedef struct Dados
     char FicouInternado[3];
 
 } Dados;
+
+typedef struct Dados dados;
 
 
 
