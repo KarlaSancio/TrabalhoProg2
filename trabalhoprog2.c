@@ -29,6 +29,27 @@ typedef struct
 
 typedef struct Dados dados;
 
+void LeArquivo();
+void PegaInformacoes(char *buffer);
+
+void LeArquivo(){
+    FILE * arquivo = fopen("covid19ES.csv", "r");
+    int cont = 0;
+
+    do //Lê o conteúdo do arquivo enquanto há algo para ser lido(até o fim do arquivo)
+    {
+        char buffer[202364] //qtd de linhas do arquivo
+        fgets(buffer, 202364, (FILE*)arquivo);// pegando as strings de cada linha do arquivo
+        cont++;
+
+        if(cont != 1){
+            printf(buffer);
+            PegaInformacoes(buffer);
+        }
+
+    } while ((getc(arquivo)) != EOF);
+    
+}
 
 
 int main(){
