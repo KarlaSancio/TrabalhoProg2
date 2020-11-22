@@ -33,17 +33,17 @@ void LeArquivo();
 void PegaInformacoes(char *buffer);
 
 void LeArquivo(){
-    FILE * arquivo = fopen("covid19ES.csv", "r");
+    FILE *arquivo = fopen("covid19ES.csv", "r");
     int cont = 0;
 
     do //Lê o conteúdo do arquivo enquanto há algo para ser lido(até o fim do arquivo)
     {
-        char buffer[202364] //qtd de linhas do arquivo
+        char buffer[202364];//qtd de linhas do arquivo
         fgets(buffer, 202364, (FILE*)arquivo);// pegando as strings de cada linha do arquivo
         cont++;
 
         if(cont != 1){
-            printf(buffer);
+            printf("%s", buffer);
             PegaInformacoes(buffer);
         }
 
@@ -51,16 +51,23 @@ void LeArquivo(){
     
 }
 
+void PegaInformacoes(char buffer[]){
+    int cont = 0;
+    //Separa os itens da string que estão separados por vírgula
+    char *item = strtok(buffer, ",");
+
+    while(item !=  NULL){
+        cont++;
+        printf( " %s\n",item);
+        item = strtok(NULL, ",");
+    }
+}
+
 
 int main(){
 
 
-    FILE*fl=fopen("covid19ES.csv","r");
-
-        if(fl==NULL){
-            printf("ERRO NA LEITURA DE ARQUIVO!");
-            exit(1);// aborta o programa;
-        }
+    LeArquivo();
 
 
 
