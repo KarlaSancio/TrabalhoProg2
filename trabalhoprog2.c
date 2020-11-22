@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 typedef struct 
 {
     //datas com 10 vetores para padrao de data;
@@ -29,8 +30,12 @@ typedef struct
 
 typedef struct Dados dados;
 
+//Declaração das funções
 void LeArquivo();
 void PegaInformacoes(char *buffer);
+void FiltroDatas(dados data);
+int QtdCasos(dados data);
+void ListaCidadesTopCasos(dados data, dados municipio);
 
 void LeArquivo(){
     FILE *arquivo = fopen("covid19ES.csv", "r");
@@ -53,23 +58,30 @@ void LeArquivo(){
 
 void PegaInformacoes(char buffer[]){
     int cont = 0;
+    FILE* arquivo2 = fopen("foi.txt", "w");
     //Separa os itens da string que estão separados por vírgula
     char *item = strtok(buffer, ",");
 
     while(item !=  NULL){
         cont++;
-        printf( " %s\n",item);
+        fprintf(arquivo2, " %s\n",item);
         item = strtok(NULL, ",");
     }
+    fclose(arquivo2);
+}
+
+void FiltroDatas(char data){
+    
 }
 
 
 int main(){
+    char data;
 
+    scanf("%s", &data);
 
     LeArquivo();
-
-
+    FiltroDatas(data);
 
 
     return 0;
