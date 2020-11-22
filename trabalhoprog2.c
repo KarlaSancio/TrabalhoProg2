@@ -30,10 +30,19 @@ typedef struct
 
 typedef struct Dados dados;
 
+struct Data
+{
+	int dia;
+	int mes;
+	int ano;
+};
+
+typedef struct Data dt;
+
 //Declaração das funções
 void LeArquivo();
 void PegaInformacoes(char *buffer);
-void FiltroDatas(dados data);
+void FiltroDatas(char data[10]);
 int QtdCasos(dados data);
 void ListaCidadesTopCasos(dados data, dados municipio);
 
@@ -70,17 +79,50 @@ void PegaInformacoes(char buffer[]){
     fclose(arquivo2);
 }
 
-void FiltroDatas(char data){
-    
+void FiltroDatas(char data[10]){
+    // 0, 1 = dia
+	// 2    = -
+	// 3, 4 = mes
+	// 5    = -
+	// 6, 7 = ano
+	// 8    = NULO
+
+    int dia, mes , ano;
+
+    char _dia[3] = {
+        data[0],
+        data[1],
+        0
+    };
+
+    char _mes[3] = {
+        data[3],
+        data[4],
+        0
+    };
+
+    char _ano[3] = {
+        data[6],
+        data[7],
+        0
+    };
+
+    dia = atoi(_dia);
+    mes = atoi(_mes);
+    ano = atoi(_ano);
+
+    printf("dia: %d", dia);
+    printf("mes: %d", mes);
+    printf("ano: %d", ano);
 }
 
 
 int main(){
-    char data;
+    char data[10];
 
-    scanf("%s", &data);
+    scanf("%s", &data[10]);
 
-    LeArquivo();
+    //LeArquivo();
     FiltroDatas(data);
 
 
