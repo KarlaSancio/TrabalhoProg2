@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define maxLinhas 10
+#define maxLinhas 100000
 #define maxColunas 12
 
 typedef struct DadosCidadeData
@@ -30,7 +30,7 @@ int main(){
     LeArquivo(DCD);
     for (int i = 0; i < maxLinhas; i++)
     {
-        printf("%s\n", DCD[i].DataCadastro);
+        // printf("%s\n", DCD[i].DataCadastro);
     }
     return 0;
 }
@@ -58,25 +58,24 @@ void LeArquivo(){
 
 void PegaInformacoes( char linha[], int nLinha){
     //Separa os itens da string que estão separados por vírgula
-    printf("%s", linha);
+    // printf("%s", linha);
     int mLinha = nLinha - 1;
     int letra = 0, comecaPalavra = 0;
 
     while (linha[letra] != '\n')
     {
-        if(linha[letra] != ',')
+        // if(linha[letra] == ',')
+        if(letra == 10)
         {
-            char word[comecaPalavra-letra];
-            for(int i = comecaPalavra; linha[i] < letra; i++) {
+            char word[letra-comecaPalavra];
+            for(int i = comecaPalavra; i < letra; i++) {
                 word[i - comecaPalavra] = linha[i];
             }
+            
             strcpy(DCD[mLinha].DataCadastro, word);
+            printf("%s\n", DCD[mLinha].DataCadastro);
             comecaPalavra = letra + 1;
         }
         letra++;
     }
 }
-
-char *item = strtok(linha, ",");
-    int mLinha = nLinha -1;
-    for(int col = 1; col <= maxColunas; col++)
