@@ -12,6 +12,9 @@ typedef struct DadosCidadeData
     char Classificacao[30];
     char Municipio[30];
     char IdadeNaDataNotificacao[30];
+    char IdadeAno[30];
+    char IdadeMes[30];
+    char IdadeDia[30];
     //vetores com 3 para sim, nao ou -;
     char ComorbidadePulmao[30];
     char ComorbidadeCardio[30];
@@ -42,9 +45,46 @@ void LeArquivo(){
         exit (1);
     }
     
+    fscanf(arquivo, "%[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^\n]",
+        DCD[nLinha].DataCadastro,
+        DCD[nLinha].DataObito,
+        DCD[nLinha].Classificacao,
+        DCD[nLinha].Municipio,
+        DCD[nLinha].IdadeNaDataNotificacao,
+        DCD[nLinha].ComorbidadePulmao,
+        DCD[nLinha].ComorbidadeCardio,
+        DCD[nLinha].ComorbidadeRenal,
+        DCD[nLinha].ComorbidadeDiabetes,
+        DCD[nLinha].ComorbidadeTabagismo,
+        DCD[nLinha].ComorbidadeObesidade,
+        DCD[nLinha].FicouInternado);
+
+    nLinha++;
+
     while (nLinha <= maxLinhas)
     {
-        fscanf(arquivo, "%[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^\n]",
+        fscanf(arquivo, "%[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^\n]",
+            DCD[nLinha].DataCadastro,
+            DCD[nLinha].DataObito,
+            DCD[nLinha].Classificacao,
+            DCD[nLinha].Municipio,
+            DCD[nLinha].IdadeAno,
+            DCD[nLinha].IdadeMes,
+            DCD[nLinha].IdadeDia,
+            DCD[nLinha].ComorbidadePulmao,
+            DCD[nLinha].ComorbidadeCardio,
+            DCD[nLinha].ComorbidadeRenal,
+            DCD[nLinha].ComorbidadeDiabetes,
+            DCD[nLinha].ComorbidadeTabagismo,
+            DCD[nLinha].ComorbidadeObesidade,
+            DCD[nLinha].FicouInternado
+        );
+        strcat(DCD[nLinha].IdadeNaDataNotificacao,DCD[nLinha].IdadeAno);
+        strcat(DCD[nLinha].IdadeNaDataNotificacao,", ");
+        strcat(DCD[nLinha].IdadeNaDataNotificacao,DCD[nLinha].IdadeMes);
+        strcat(DCD[nLinha].IdadeNaDataNotificacao,", ");
+        strcat(DCD[nLinha].IdadeNaDataNotificacao,DCD[nLinha].IdadeDia);
+        printf("%s %s %s %s %s %s %s %s %s %s %s %s\n", 
             DCD[nLinha].DataCadastro,
             DCD[nLinha].DataObito,
             DCD[nLinha].Classificacao,
@@ -57,20 +97,7 @@ void LeArquivo(){
             DCD[nLinha].ComorbidadeTabagismo,
             DCD[nLinha].ComorbidadeObesidade,
             DCD[nLinha].FicouInternado
-        );
-        printf("%s %s %s %s %s %s %s %s %s %s %s %s", 
-            DCD[nLinha].DataCadastro,
-            DCD[nLinha].DataObito,
-            DCD[nLinha].Classificacao,
-            DCD[nLinha].Municipio,
-            DCD[nLinha].IdadeNaDataNotificacao,
-            DCD[nLinha].ComorbidadePulmao,
-            DCD[nLinha].ComorbidadeCardio,
-            DCD[nLinha].ComorbidadeRenal,
-            DCD[nLinha].ComorbidadeDiabetes,
-            DCD[nLinha].ComorbidadeTabagismo,
-            DCD[nLinha].ComorbidadeObesidade,
-            DCD[nLinha].FicouInternado);
+            );
         printf("\n");
         nLinha++;
     }
