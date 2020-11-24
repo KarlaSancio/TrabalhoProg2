@@ -21,54 +21,62 @@ typedef struct DadosCidadeData
     char ComorbidadeObesidade[3];
     char FicouInternado[13];
 }tDCD;
-
-void LeArquivo(tDCD *DCD[]);
-void PegaInformacoes(tDCD *DCD[], char *linha[], int cont);
+tDCD DCD[maxLinhas];
+void LeArquivo();
+void PegaInformacoes(char linha[], int cont);
 
 int main(){
-    tDCD DCD[maxLinhas];
-
+   
     LeArquivo(DCD);
-
+    for (int i = 0; i < maxLinhas; i++)
+    {
+        printf("%s\n", DCD[i].DataCadastro);
+    }
     return 0;
 }
 
-void LeArquivo(tDCD *DCD[]){
+void LeArquivo(){
     FILE *arquivo = fopen("covid19ES.csv", "r");
     int nLinha = 0, i;
-
     if(arquivo==NULL){
         printf("Error\n");
         exit (1);
     }
-
-    do //Lê o conteúdo do arquivo enquanto há algo para ser lido(até o fim do arquivo)
+    // (getc(arquivo)) != EOF
+    while ( nLinha != maxLinhas) //Lê o conteúdo do arquivo enquanto há algo para ser lido(até o fim do arquivo)
     {
-        char bufferLinha[202363];//qtd de linhas do arquivo
-        fgets(bufferLinha, 202363, (FILE*)arquivo);// pegando as strings de cada linha do arquivo
+        char bufferLinha[202363]; //qtd de linhas do arquivo
+        fgets(bufferLinha, 202363, (FILE*)arquivo); // pegando as strings de cada linha do arquivo
         
         if(nLinha != 0){
-            PegaInformacoes(DCD, bufferLinha, nLinha);
+            PegaInformacoes( bufferLinha, nLinha);
         }
         nLinha++;
-
-    //} while ((getc(arquivo)) != EOF);
-    } while ( nLinha != 10);
-    
+    }
     fclose(arquivo);
 }
 
-void PegaInformacoes(tDCD *DCD[], char *linha[], int nLinha){
+void PegaInformacoes( char linha[], int nLinha){
     //Separa os itens da string que estão separados por vírgula
-    char *item = strtok(linha, ",");
+    printf("%s", linha);
+    int mLinha = nLinha - 1;
+    int letra = 0, comecaPalavra = 0;
 
-    for(int col = 1; col <= maxColunas; col++)
+    while (linha[letra] != '\n')
     {
-        if(col == 1)
-            strcpy(DCD[col]->DataCadastro, item);
-        if(col == 2)
-            // DCD[col].DataObito = item;
-        // etc até o 12º item
-        item = strtok(NULL, ","); //pesquisar o que e
-    } 
+        if(linha[letra] != ',')
+        {
+            char word[comecaPalavra-letra];
+            for(int i = comecaPalavra; linha[i] < letra; i++) {
+                word[i - comecaPalavra] = linha[i];
+            }
+            strcpy(DCD[mLinha].DataCadastro, word);
+            comecaPalavra = letra + 1;
+        }
+        letra++;
+    }
 }
+
+char *item = strtok(linha, ",");
+    int mLinha = nLinha -1;
+    for(int col = 1; col <= maxColunas; col++)
