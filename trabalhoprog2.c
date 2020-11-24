@@ -7,19 +7,19 @@
 
 typedef struct DadosCidadeData
 {
-    char DataCadastro[10];
-    char DataObito[10];
-    char Classificacao[11];
+    char DataCadastro[30];
+    char DataObito[30];
+    char Classificacao[30];
     char Municipio[30];
     char IdadeNaDataNotificacao[30];
     //vetores com 3 para sim, nao ou -;
-    char ComorbidadePulmao[3];
-    char ComorbidadeCardio[3];
-    char ComorbidadeRenal[3];
-    char ComorbidadeDiabetes[3];
-    char ComorbidadeTabagismo[3];
-    char ComorbidadeObesidade[3];
-    char FicouInternado[13];
+    char ComorbidadePulmao[30];
+    char ComorbidadeCardio[30];
+    char ComorbidadeRenal[30];
+    char ComorbidadeDiabetes[30];
+    char ComorbidadeTabagismo[30];
+    char ComorbidadeObesidade[30];
+    char FicouInternado[30];
 }tDCD;
 tDCD DCD[maxLinhas];
 void LeArquivo();
@@ -34,16 +34,17 @@ int main(){
 
 void LeArquivo(){
 
-    FILE *arquivo = fopen("covid19ES2.csv", "r");
-    int nLinha = 0, i;
-    char lixo1[20], lixo2[20];
+    FILE *arquivo = fopen("covid19ES.csv", "r");
+    int nLinha = 0;
 
     if(arquivo==NULL){
         printf("Error\n");
         exit (1);
     }
-    for (i = 1; i <= maxLinhas; i++){
-        fscanf(arquivo, "%[^44], %[^44], %[^44], %[^44], %[^44], %[^44], %[^44], %[^44], %[^44], %[^44], %[^44], %[^44]",
+    
+    while (nLinha <= maxLinhas)
+    {
+        fscanf(arquivo, "%[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^\n]",
             DCD[nLinha].DataCadastro,
             DCD[nLinha].DataObito,
             DCD[nLinha].Classificacao,
@@ -57,49 +58,22 @@ void LeArquivo(){
             DCD[nLinha].ComorbidadeObesidade,
             DCD[nLinha].FicouInternado
         );
+        printf("%s %s %s %s %s %s %s %s %s %s %s %s", 
+            DCD[nLinha].DataCadastro,
+            DCD[nLinha].DataObito,
+            DCD[nLinha].Classificacao,
+            DCD[nLinha].Municipio,
+            DCD[nLinha].IdadeNaDataNotificacao,
+            DCD[nLinha].ComorbidadePulmao,
+            DCD[nLinha].ComorbidadeCardio,
+            DCD[nLinha].ComorbidadeRenal,
+            DCD[nLinha].ComorbidadeDiabetes,
+            DCD[nLinha].ComorbidadeTabagismo,
+            DCD[nLinha].ComorbidadeObesidade,
+            DCD[nLinha].FicouInternado);
+        printf("\n");
+        nLinha++;
     }
-
-    //char caracteresLinha[150];
-    //while ((fscanf(arquivo, "%[^\n]%*c", caracteresLinha)) != EOF) 
-    //{
-        //if(nLinha != 0){
-            //PegaInformacoesDaLinha( caracteresLinha, nLinha - 1);
-            //printf("%d %s\n", nLinha, caracteresLinha);
-        //}
-        //nLinha++;
-    //}
     
     fclose(arquivo);
 }
-
-void PegaInformacoesDaLinha( char linha[], int mLinha){
-    // printf("%s %d\n", linha, mLinha);
-    int posLetra = 0, comecaPalavra = 0, numItem = 0;
-    
-    while (linha[posLetra] != '\n')
-    {
-        if(linha[posLetra] == ',')
-        {
-            char word[posLetra-comecaPalavra];
-            for(int i = comecaPalavra; i < posLetra; i++) 
-            {
-                word[i - comecaPalavra] = linha[i];
-            }
-            
-            if(numItem == 0)
-            {
-                strcpy(DCD[mLinha].DataCadastro, word);
-                // printf("%s %s \n", word, DCD[mLinha].DataCadastro);
-            }
-            else if(numItem == 1)
-            {
-                strcpy(DCD[mLinha].DataObito, word);
-                // printf("%s\n", DCD[mLinha].DataObito);
-            }
-            numItem++;
-            comecaPalavra = posLetra + 1;
-        }
-        posLetra++;
-    }
-}
-
