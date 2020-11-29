@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 // #define maxLinhas 10
 #define maxLinhas 202363
@@ -54,14 +55,16 @@ void TransformaDatas();
 void ListaCasosPorMunicipio();
 void QtdCasosEntreDatas();
 tData FiltroDeDatas(char data[]);
-int NumberOfDays(int N) ;
+int NumberOfDays(int N);
+void Porcentagens();
 
 int main(){
-   
+
     LeArquivo();
     // ListaCasosPorMunicipio();
     TransformaDatas();
-    QtdCasosEntreDatas();
+    //QtdCasosEntreDatas();
+    Porcentagens();
     
     return 0;
 }
@@ -281,6 +284,7 @@ tData FiltroDeDatas(char data[]){
 }
 
 int NumberOfDays(int N){ 
+
     if (N == 1 || N == 3 || N == 5 
         || N == 7 || N == 8 || N == 10 
         || N == 12) { 
@@ -295,4 +299,33 @@ int NumberOfDays(int N){
     else if (N == 2) { 
         return 28;
     }
+}
+
+void Porcentagens(){
+    char comando[30];
+
+    scanf("%s", comando);
+
+    int nLinha = 1, qtdInternado = 0, qtdMorreram = 0, qtdInternadoMorreu = 0;
+    float porcentagemInternadas = 0.0, porcentagemMorreram = 0.0, porcentagemInternadasMorreram = 0.0;
+
+    for(nLinha = 1; nLinha <= maxLinhas; nLinha++){
+        if(strcmp(comando, "TODAS") == 0){
+        
+            if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0){
+                qtdInternado++;
+            }
+            
+            if(DCD[nLinha].DataObitoAno != 0){
+                qtdMorreram++;
+            }
+        }   
+    }
+    porcentagemInternadas =  ((float) qtdInternado/(float) nLinha) * 100.0;
+    porcentagemMorreram =  ((float) qtdMorreram/(float) nLinha) * 100.0;
+    printf("%.3f\n", porcentagemInternadas);
+    printf("%.3f\n", porcentagemMorreram);
+    printf("%d\n", qtdInternado);
+    printf("%d\n", qtdMorreram);
+    printf("%d",nLinha);
 }
