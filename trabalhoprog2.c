@@ -3,7 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 
-//#define maxLinhas 30
+// #define maxLinhas 20
 #define maxLinhas 202363
 #define maxColunas 12
 #define qtdMunicipiosES 78
@@ -13,6 +13,8 @@ typedef struct Municipio
 {
     int Casos;
     char Nome[30];
+    int vetorNulo;
+
 }tMun;
 tMun CasosPorMunicipio[qtdMunicipiosES];
 
@@ -59,35 +61,12 @@ int NumberOfDays(int N);
 void Porcentagens();
 
 int main(){
-    int var;
 
     LeArquivo();
-    // ListaCasosPorMunicipio();
+    ListaCasosPorMunicipio();
     TransformaDatas();
-    //QtdCasosEntreDatas();
-    Porcentagens();
-    while(1){
-        scanf("%d", &var);
-          printf("%s %s %s %s %s %s %s %s %s %s %s %s", 
-             DCD[var].DataCadastro,
-             DCD[var].DataObito,
-             DCD[var].Classificacao,
-             DCD[var].Municipio,
-             DCD[var].IdadeNaDataNotificacao,
-             DCD[var].ComorbidadePulmao,
-             DCD[var].ComorbidadeCardio,
-             DCD[var].ComorbidadeRenal,
-             DCD[var].ComorbidadeDiabetes,
-             DCD[var].ComorbidadeTabagismo,
-             DCD[var].ComorbidadeObesidade,
-             DCD[var].FicouInternado
-             );
-          printf("\n");
-
-          if(var == -1){
-              return 0;
-          }
-    }
+    // QtdCasosEntreDatas();
+    // Porcentagens();
     
     return 0;
 }
@@ -100,65 +79,15 @@ void LeArquivo(){
     if(arquivo==NULL){
         printf("Error\n");
         exit (1);
-    }
+    } 
     
     // fscnf para ler o cabeçalho
-    fscanf(arquivo, "%[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^\n]",
-        DCD[nLinha].DataCadastro,
-        DCD[nLinha].DataObito,
-        DCD[nLinha].Classificacao,
-        DCD[nLinha].Municipio,
-        DCD[nLinha].IdadeNaDataNotificacao,
-        DCD[nLinha].ComorbidadePulmao,
-        DCD[nLinha].ComorbidadeCardio,
-        DCD[nLinha].ComorbidadeRenal,
-        DCD[nLinha].ComorbidadeDiabetes,
-        DCD[nLinha].ComorbidadeTabagismo,
-        DCD[nLinha].ComorbidadeObesidade,
-        DCD[nLinha].FicouInternado);
-
+    fscanf(arquivo, "%[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^\n]\n",
+        DCD[nLinha].DataCadastro,DCD[nLinha].DataObito,DCD[nLinha].Classificacao,DCD[nLinha].Municipio,DCD[nLinha].IdadeNaDataNotificacao,DCD[nLinha].ComorbidadePulmao,DCD[nLinha].ComorbidadeCardio,DCD[nLinha].ComorbidadeRenal,DCD[nLinha].ComorbidadeDiabetes,DCD[nLinha].ComorbidadeTabagismo,DCD[nLinha].ComorbidadeObesidade,DCD[nLinha].FicouInternado);
     nLinha++;
 
-    while (nLinha <= maxLinhas)
-    {
-        // fscanf para ler as linhas do arquivo
-        fscanf(arquivo, "%[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^\n]",
-            DCD[nLinha].DataCadastro,
-            DCD[nLinha].DataObito,
-            DCD[nLinha].Classificacao,
-            DCD[nLinha].Municipio,
-            DCD[nLinha].IdadeAno,
-            DCD[nLinha].IdadeMes,
-            DCD[nLinha].IdadeDia,
-            DCD[nLinha].ComorbidadePulmao,
-            DCD[nLinha].ComorbidadeCardio,
-            DCD[nLinha].ComorbidadeRenal,
-            DCD[nLinha].ComorbidadeDiabetes,
-            DCD[nLinha].ComorbidadeTabagismo,
-            DCD[nLinha].ComorbidadeObesidade,
-            DCD[nLinha].FicouInternado
-        );
-        strcat(DCD[nLinha].IdadeNaDataNotificacao,DCD[nLinha].IdadeAno);
-        strcat(DCD[nLinha].IdadeNaDataNotificacao,", ");
-        strcat(DCD[nLinha].IdadeNaDataNotificacao,DCD[nLinha].IdadeMes);
-        strcat(DCD[nLinha].IdadeNaDataNotificacao,", ");
-        strcat(DCD[nLinha].IdadeNaDataNotificacao,DCD[nLinha].IdadeDia);
-
-        //  printf("%s %s %s %s %s %s %s %s %s %s %s %s", 
-        //      DCD[nLinha].DataCadastro,
-        //      DCD[nLinha].DataObito,
-        //      DCD[nLinha].Classificacao,
-        //      DCD[nLinha].Municipio,
-        //      DCD[nLinha].IdadeNaDataNotificacao,
-        //      DCD[nLinha].ComorbidadePulmao,
-        //      DCD[nLinha].ComorbidadeCardio,
-        //      DCD[nLinha].ComorbidadeRenal,
-        //      DCD[nLinha].ComorbidadeDiabetes,
-        //      DCD[nLinha].ComorbidadeTabagismo,
-        //      DCD[nLinha].ComorbidadeObesidade,
-        //      DCD[nLinha].FicouInternado
-        //      );
-        //   printf("\n");
+    while (fscanf(arquivo, "%[^,], %[^,], %[^,], %[^,], \"%[^\"]\", %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^\n]\n",
+            DCD[nLinha].DataCadastro,DCD[nLinha].DataObito,DCD[nLinha].Classificacao,DCD[nLinha].Municipio,DCD[nLinha].IdadeNaDataNotificacao,DCD[nLinha].ComorbidadePulmao,DCD[nLinha].ComorbidadeCardio,DCD[nLinha].ComorbidadeRenal,DCD[nLinha].ComorbidadeDiabetes,DCD[nLinha].ComorbidadeTabagismo,DCD[nLinha].ComorbidadeObesidade,DCD[nLinha].FicouInternado) != EOF){
         nLinha++;
     }
     fclose(arquivo);
@@ -190,80 +119,50 @@ void TransformaDatas(){
         nLinha++;
     }
 
-    // nLinha = 1;
-    // while (nLinha <= maxLinhas)
-    // {
-    //     printf("%d,%d,%d - - - %d,%d,%d\n", DCD[nLinha].DataCadastroAno, DCD[nLinha].DataCadastroMes, DCD[nLinha].DataCadastroDia, 
-    //     DCD[nLinha].DataObitoAno, DCD[nLinha].DataObitoMes, DCD[nLinha].DataObitoDia);
-    //     nLinha++;
-    // }
 }
 
 void ListaCasosPorMunicipio(){
 
-    int i=0;
+    int i=0,j=0,k=0;
 
     // preenche lista vazia
-    for (int k = 0; k < qtdMunicipiosES; k++)
-    {
-        strcpy(CasosPorMunicipio[k].Nome, "\0");
-        CasosPorMunicipio[k].Casos = 0;
+    for (i = 0; i < qtdMunicipiosES; i++){
+        strcpy(CasosPorMunicipio[i].Nome, "\0");
+        CasosPorMunicipio[i].Casos = 0;
+        CasosPorMunicipio[i].vetorNulo = 0;
     }
-    
-    // acha cidades
-    int jaexisteomuninicipio;
-    for (int i = 1; i <= maxLinhas; i++){
-        jaexisteomuninicipio = 0;
-        for (int j = 0; j < qtdMunicipiosES; j++){
-            char var1[30];
-            char var2[30];
-            strcpy(var1, DCD[i].Municipio);
-            strcpy(var2, CasosPorMunicipio[j].Nome);
-            if (strcmp(var1, var2)==0){
-                jaexisteomuninicipio = 1;
-                j = qtdMunicipiosES;
+
+    //preenche lista com tds municipios
+   for (i = 1; i <= maxLinhas; i++){
+        int jaExiste = 0;
+        for (j = 0; j < qtdMunicipiosES; j++){
+            if(strcmp(CasosPorMunicipio[j].Nome, DCD[i].Municipio) == 0){
+                jaExiste = 1;
             }
-        }
-        if (jaexisteomuninicipio == 0)
-        {
-            for (int w = 0; w < qtdMunicipiosES; w++)
-            {
-                if (strcmp(CasosPorMunicipio[w].Nome, "\0")<0)
-                {
-                    strcpy(CasosPorMunicipio[w].Nome, DCD[i].Municipio);
-                    w = qtdMunicipiosES;
-                }
+            if(CasosPorMunicipio[j].vetorNulo == 0 && jaExiste == 0){
+               strcpy(CasosPorMunicipio[j].Nome, DCD[i].Municipio); 
+               CasosPorMunicipio[j].vetorNulo++; 
+               break;
             }
         }
     }
-
-    // inicio metodo bolha
-    // tMun municipioTemporario;
-    // for (int k = 0; k < qtdMunicipiosES-1; k++){
-    //     for (int j = k + 1; j < qtdMunicipiosES; j++){ 
-    //         if(strcmp(CasosPorMunicipio[j].Nome, CasosPorMunicipio[k].Nome) > 0){
-    //             strcpy(municipioTemporario.Nome, CasosPorMunicipio[j].Nome);
-    //             strcpy(CasosPorMunicipio[k].Nome, CasosPorMunicipio[j].Nome);
-    //             strcpy(CasosPorMunicipio[j].Nome, municipioTemporario.Nome);
-    //         }
-    //     }
-    // }
-    // fim metodo bolha
-
-    // marca casos por cidade
+    // conta casos das cidades
     for (i = 1; i <= maxLinhas; i++){
-        if(strcmp("Confirmados",DCD[i].Classificacao)==0){     
-            for (int j = 0; j < qtdMunicipiosES; j++){
+        if(DCD[i].Classificacao[0]=='C'){     
+            for (j = 0; j < qtdMunicipiosES; j++){
                 if (strcmp(DCD[i].Municipio, CasosPorMunicipio[j].Nome)==0){
                     CasosPorMunicipio[j].Casos++;
+                    break;
                 }
             }
         }
     }
 
-    for ( i = 0; i <= maxLinhas; i++){
-        printf("%s-%d",CasosPorMunicipio[i].Nome,CasosPorMunicipio[i].Casos);
+    for ( i = 0; i < qtdMunicipiosES; i++){
+        printf("%s-%d\n",CasosPorMunicipio[i].Nome,CasosPorMunicipio[i].Casos);
     }
+    
+
 }
 
 void QtdCasosEntreDatas(){
@@ -276,9 +175,6 @@ void QtdCasosEntreDatas(){
 
     dataInicio = FiltroDeDatas(d1);
     dataFinal = FiltroDeDatas(d2);
-
-    // printf("Ano Inicio: %d, Mes Inicio: %d, Dia Inicio: %d, Ano Final: %d, Mes Final: %d, Dia Final: %d\n", 
-    // dataInicio.ano, dataInicio.mes, dataInicio.dia, dataFinal.ano, dataFinal.mes, dataFinal.dia);
 
     for(int nLinha = 1; nLinha <= maxLinhas; nLinha++){
         int dia = dataInicio.dia;
@@ -309,7 +205,6 @@ tData FiltroDeDatas(char data[]){
 }
 
 int NumberOfDays(int N){ 
-
     if (N == 1 || N == 3 || N == 5 
         || N == 7 || N == 8 || N == 10 
         || N == 12) { 
@@ -364,8 +259,5 @@ void Porcentagens(){
     printf("%.3f\n", porcentagemInternadas);
     printf("%.3f\n", porcentagemMorreram);
     printf("%.3f\n", porcentagemInternadasMorreram);
-    printf("INTERNADOS: %d\n", qtdInternadoComCovid);
-    printf("CONFIRMADOS QUE MORRERAM: %d\n", qtdMorreramComCovid);
-    printf("CONFIRMADOS: %d\n", qtdConfirmados);
-    printf("MORRERAM: %d\n", mortes);
+    
 }
