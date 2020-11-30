@@ -8,18 +8,15 @@
 #define maxColunas 12
 #define qtdMunicipiosES 78
 
-// "lista" ods municípios do ES
-typedef struct Municipio
+typedef struct Municipio// "lista" ods municípios do ES
 {
     int Casos;
     char Nome[30];
     int vetorNulo;
 
 }tMun;
-tMun CasosPorMunicipio[qtdMunicipiosES];
 
-//"tabela" que guarda as informacoes
-typedef struct DadosCidadeData
+typedef struct DadosCidadeData//"tabela" que guarda as informacoes
 {
     char DataCadastro[30];
     int DataCadastroAno;
@@ -43,103 +40,102 @@ typedef struct DadosCidadeData
     char ComorbidadeObesidade[30];
     char FicouInternado[30];
 }tDCD;
-tDCD DCD[maxLinhas]; 
 
-typedef struct Data
+typedef struct Data// struct para o filtro de data
 {
     int dia;
     int mes;
     int ano;
 }tData;
 
+tDCD DCD[maxLinhas];
+tMun CasosPorMunicipio[qtdMunicipiosES];
+
 void LeArquivo();
 void TransformaDatas();
 void ListaCasosPorMunicipio();
 void QtdCasosEntreDatas();
 tData FiltroDeDatas(char data[]);
-int NumberOfDays(int N);
+int NumeroDeDias(int N);
 void Porcentagens();
 
-int main(){
+int main()
+{
 
     LeArquivo();
-    ListaCasosPorMunicipio();
+    // ListaCasosPorMunicipio();
     TransformaDatas();
-    // QtdCasosEntreDatas();
-    // Porcentagens();
+    //QtdCasosEntreDatas();
+    Porcentagens();
     
     return 0;
 }
 
-void LeArquivo(){
-
+void LeArquivo()// abre, le o arquivo em uma struct, e fecha o arquivo
+{
     FILE *arquivo = fopen("covid19ES.csv", "r");
     int nLinha = 0;
 
-    if(arquivo==NULL){
+    if(arquivo==NULL)
+    {
         printf("Error\n");
         exit (1);
     } 
     
     // fscnf para ler o cabeçalho
-    fscanf(arquivo, "%[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^\n]\n",
-        DCD[nLinha].DataCadastro,DCD[nLinha].DataObito,DCD[nLinha].Classificacao,DCD[nLinha].Municipio,DCD[nLinha].IdadeNaDataNotificacao,DCD[nLinha].ComorbidadePulmao,DCD[nLinha].ComorbidadeCardio,DCD[nLinha].ComorbidadeRenal,DCD[nLinha].ComorbidadeDiabetes,DCD[nLinha].ComorbidadeTabagismo,DCD[nLinha].ComorbidadeObesidade,DCD[nLinha].FicouInternado);
+    fscanf(arquivo, "%[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^\n]\n",DCD[nLinha].DataCadastro,DCD[nLinha].DataObito,DCD[nLinha].Classificacao,DCD[nLinha].Municipio,DCD[nLinha].IdadeNaDataNotificacao,DCD[nLinha].ComorbidadePulmao,DCD[nLinha].ComorbidadeCardio,DCD[nLinha].ComorbidadeRenal,DCD[nLinha].ComorbidadeDiabetes,DCD[nLinha].ComorbidadeTabagismo,DCD[nLinha].ComorbidadeObesidade,DCD[nLinha].FicouInternado);
     nLinha++;
 
-    while (fscanf(arquivo, "%[^,], %[^,], %[^,], %[^,], \"%[^\"]\", %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^\n]\n",
-            DCD[nLinha].DataCadastro,DCD[nLinha].DataObito,DCD[nLinha].Classificacao,DCD[nLinha].Municipio,DCD[nLinha].IdadeNaDataNotificacao,DCD[nLinha].ComorbidadePulmao,DCD[nLinha].ComorbidadeCardio,DCD[nLinha].ComorbidadeRenal,DCD[nLinha].ComorbidadeDiabetes,DCD[nLinha].ComorbidadeTabagismo,DCD[nLinha].ComorbidadeObesidade,DCD[nLinha].FicouInternado) != EOF){
+    while (fscanf(arquivo, "%[^,], %[^,], %[^,], %[^,], \"%[^\"]\", %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^\n]\n",DCD[nLinha].DataCadastro,DCD[nLinha].DataObito,DCD[nLinha].Classificacao,DCD[nLinha].Municipio,DCD[nLinha].IdadeNaDataNotificacao,DCD[nLinha].ComorbidadePulmao,DCD[nLinha].ComorbidadeCardio,DCD[nLinha].ComorbidadeRenal,DCD[nLinha].ComorbidadeDiabetes,DCD[nLinha].ComorbidadeTabagismo,DCD[nLinha].ComorbidadeObesidade,DCD[nLinha].FicouInternado) != EOF)
+    {
         nLinha++;
     }
     fclose(arquivo);
 }
 
-// Filtro de datas
-void TransformaDatas(){ 
+void TransformaDatas()// Filtro de datas
+{ 
     int nLinha = 1;
     while (nLinha <= maxLinhas)
     {
-        sscanf(DCD[nLinha].DataCadastro, "%d-%d-%d", 
-        &DCD[nLinha].DataCadastroAno, 
-        &DCD[nLinha].DataCadastroMes, 
-        &DCD[nLinha].DataCadastroDia
-        );
-        
+        sscanf(DCD[nLinha].DataCadastro, "%d-%d-%d",&DCD[nLinha].DataCadastroAno,&DCD[nLinha].DataCadastroMes,&DCD[nLinha].DataCadastroDia); 
         nLinha++;
     }
 
     nLinha = 1;
     while (nLinha <= maxLinhas)
     {
-        sscanf(DCD[nLinha].DataObito, "%d-%d-%d", 
-        &DCD[nLinha].DataObitoAno, 
-        &DCD[nLinha].DataObitoMes, 
-        &DCD[nLinha].DataObitoDia
-        );
-        
+        sscanf(DCD[nLinha].DataObito, "%d-%d-%d", &DCD[nLinha].DataObitoAno, &DCD[nLinha].DataObitoMes, &DCD[nLinha].DataObitoDia); 
         nLinha++;
     }
 
 }
 
-void ListaCasosPorMunicipio(){
+void ListaCasosPorMunicipio()// Lista em ordem alfabetica cidades com mais de N casos
+{
 
     int i=0,j=0,k=0;
 
     // preenche lista vazia
-    for (i = 0; i < qtdMunicipiosES; i++){
+    for (i = 0; i < qtdMunicipiosES; i++)
+    {
         strcpy(CasosPorMunicipio[i].Nome, "\0");
         CasosPorMunicipio[i].Casos = 0;
         CasosPorMunicipio[i].vetorNulo = 0;
     }
 
     //preenche lista com tds municipios
-   for (i = 1; i <= maxLinhas; i++){
+   for (i = 1; i <= maxLinhas; i++)
+   {
         int jaExiste = 0;
-        for (j = 0; j < qtdMunicipiosES; j++){
-            if(strcmp(CasosPorMunicipio[j].Nome, DCD[i].Municipio) == 0){
+        for (j = 0; j < qtdMunicipiosES; j++)
+        {
+            if(strcmp(CasosPorMunicipio[j].Nome, DCD[i].Municipio) == 0)
+            {
                 jaExiste = 1;
             }
-            if(CasosPorMunicipio[j].vetorNulo == 0 && jaExiste == 0){
+            if(CasosPorMunicipio[j].vetorNulo == 0 && jaExiste == 0)
+            {
                strcpy(CasosPorMunicipio[j].Nome, DCD[i].Municipio); 
                CasosPorMunicipio[j].vetorNulo++; 
                break;
@@ -147,10 +143,14 @@ void ListaCasosPorMunicipio(){
         }
     }
     // conta casos das cidades
-    for (i = 1; i <= maxLinhas; i++){
-        if(DCD[i].Classificacao[0]=='C'){     
-            for (j = 0; j < qtdMunicipiosES; j++){
-                if (strcmp(DCD[i].Municipio, CasosPorMunicipio[j].Nome)==0){
+    for (i = 1; i <= maxLinhas; i++)
+    {
+        if(DCD[i].Classificacao[0]=='C')
+        {     
+            for (j = 0; j < qtdMunicipiosES; j++)
+            {
+                if (strcmp(DCD[i].Municipio, CasosPorMunicipio[j].Nome)==0)
+                {
                     CasosPorMunicipio[j].Casos++;
                     break;
                 }
@@ -158,14 +158,14 @@ void ListaCasosPorMunicipio(){
         }
     }
 
-    for ( i = 0; i < qtdMunicipiosES; i++){
+    for ( i = 0; i < qtdMunicipiosES; i++)
+    {
         printf("%s-%d\n",CasosPorMunicipio[i].Nome,CasosPorMunicipio[i].Casos);
     }
-    
-
 }
 
-void QtdCasosEntreDatas(){
+void QtdCasosEntreDatas()// informa a qtd de casos entre duas datas, d1 e d2
+{
     char d1[11], d2[11];
     tData dataInicio;
     tData dataFinal;
@@ -176,18 +176,20 @@ void QtdCasosEntreDatas(){
     dataInicio = FiltroDeDatas(d1);
     dataFinal = FiltroDeDatas(d2);
 
-    for(int nLinha = 1; nLinha <= maxLinhas; nLinha++){
+    for(int nLinha = 1; nLinha <= maxLinhas; nLinha++)
+    {
         int dia = dataInicio.dia;
-        for(int mes = dataInicio.mes; mes <= dataFinal.mes; mes++){
-            int maxDia = NumberOfDays(mes);
-            if(mes == dataFinal.mes){
+        for(int mes = dataInicio.mes; mes <= dataFinal.mes; mes++)
+        {
+            int maxDia = NumeroDeDias(mes);
+            if(mes == dataFinal.mes)
+            {
                 maxDia = dataFinal.dia;
             }
             while (dia <= maxDia)
             {
-                if(DCD[nLinha].DataCadastroMes == mes &&
-                DCD[nLinha].DataCadastroDia == dia &&
-                DCD[nLinha].Classificacao[0] == 'C'){
+                if(DCD[nLinha].DataCadastroMes == mes && DCD[nLinha].DataCadastroDia == dia && DCD[nLinha].Classificacao[0] == 'C')
+                {
                     contaCasos++;
                 }
                 dia++;
@@ -198,30 +200,33 @@ void QtdCasosEntreDatas(){
     printf("%d\n", contaCasos);
 }
 
-tData FiltroDeDatas(char data[]){ 
+tData FiltroDeDatas(char data[])// transforma datas em informacao comparavel
+{ 
     tData resData;
     sscanf(data, "%d-%d-%d", &resData.ano, &resData.mes, &resData.dia);
     return resData;
 }
 
-int NumberOfDays(int N){ 
-    if (N == 1 || N == 3 || N == 5 
-        || N == 7 || N == 8 || N == 10 
-        || N == 12) { 
+int NumeroDeDias(int N)// padroniza o final dos meses
+{ 
+    if (N == 1 || N == 3 || N == 5 || N == 7 || N == 8 || N == 10 || N == 12)
+    { 
         return 31;
     } 
   
-    else if (N == 4 || N == 6 
-             || N == 9 || N == 11) { 
+    else if (N == 4 || N == 6 || N == 9 || N == 11)
+    { 
         return 30;
     } 
   
-    else if (N == 2) { 
+    else if (N == 2)
+    { 
         return 28;
     }
 }
 
-void Porcentagens(){
+void Porcentagens()// determina % de internados, e mortes decorrentes das internacoes
+{
     char comando[30];
 
     scanf("%s", comando);
@@ -229,24 +234,29 @@ void Porcentagens(){
     int nLinha, qtdInternadoComCovid = 0, qtdMorreramComCovid = 0, qtdInternadoMorreu = 0, qtdConfirmados = 0, mortes = 0;
     float porcentagemInternadas = 0.0, porcentagemMorreram = 0.0, porcentagemInternadasMorreram = 0.0;
 
-    if(strcmp(comando, "TODAS") == 0){
-        for(nLinha = 1; nLinha <= maxLinhas; nLinha++){
-            
-            if(strcmp(DCD[nLinha].Classificacao, "Confirmados") == 0){
+    if(strcmp(comando, "TODAS") == 0)
+    {
+        for(nLinha = 1; nLinha <= maxLinhas; nLinha++)
+        { 
+            if(strcmp(DCD[nLinha].Classificacao, "Confirmados") == 0)
+            {
                 qtdConfirmados++;
-                if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0){
+                if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0)
+                {
                     qtdInternadoComCovid++;
                 }
-                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0){
+                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0)
+                {
                     qtdMorreramComCovid++;
                 }
-            
-            }
 
-            if(DCD[nLinha].DataObitoAno != 0){
-                mortes++;
-                if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0){
-                    qtdInternadoMorreu++;
+                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0)
+                {
+                    mortes++;
+                    if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0)
+                    {
+                        qtdInternadoMorreu++;
+                    }
                 }
             }
         }    
