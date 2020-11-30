@@ -3,7 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 
-// #define maxLinhas 10
+//#define maxLinhas 30
 #define maxLinhas 202363
 #define maxColunas 12
 #define qtdMunicipiosES 78
@@ -59,12 +59,35 @@ int NumberOfDays(int N);
 void Porcentagens();
 
 int main(){
+    int var;
 
     LeArquivo();
     // ListaCasosPorMunicipio();
     TransformaDatas();
     //QtdCasosEntreDatas();
     Porcentagens();
+    while(1){
+        scanf("%d", &var);
+          printf("%s %s %s %s %s %s %s %s %s %s %s %s", 
+             DCD[var].DataCadastro,
+             DCD[var].DataObito,
+             DCD[var].Classificacao,
+             DCD[var].Municipio,
+             DCD[var].IdadeNaDataNotificacao,
+             DCD[var].ComorbidadePulmao,
+             DCD[var].ComorbidadeCardio,
+             DCD[var].ComorbidadeRenal,
+             DCD[var].ComorbidadeDiabetes,
+             DCD[var].ComorbidadeTabagismo,
+             DCD[var].ComorbidadeObesidade,
+             DCD[var].FicouInternado
+             );
+          printf("\n");
+
+          if(var == -1){
+              return 0;
+          }
+    }
     
     return 0;
 }
@@ -79,6 +102,7 @@ void LeArquivo(){
         exit (1);
     }
     
+    // fscnf para ler o cabeçalho
     fscanf(arquivo, "%[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^\n]",
         DCD[nLinha].DataCadastro,
         DCD[nLinha].DataObito,
@@ -97,6 +121,7 @@ void LeArquivo(){
 
     while (nLinha <= maxLinhas)
     {
+        // fscanf para ler as linhas do arquivo
         fscanf(arquivo, "%[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^,], %[^\n]",
             DCD[nLinha].DataCadastro,
             DCD[nLinha].DataObito,
@@ -119,7 +144,7 @@ void LeArquivo(){
         strcat(DCD[nLinha].IdadeNaDataNotificacao,", ");
         strcat(DCD[nLinha].IdadeNaDataNotificacao,DCD[nLinha].IdadeDia);
 
-        //  printf("%s %s %s %s %s %s %s %s %s %s %s %s\n", 
+        //  printf("%s %s %s %s %s %s %s %s %s %s %s %s", 
         //      DCD[nLinha].DataCadastro,
         //      DCD[nLinha].DataObito,
         //      DCD[nLinha].Classificacao,
@@ -306,26 +331,41 @@ void Porcentagens(){
 
     scanf("%s", comando);
 
-    int nLinha = 1, qtdInternado = 0, qtdMorreram = 0, qtdInternadoMorreu = 0;
+    int nLinha, qtdInternadoComCovid = 0, qtdMorreramComCovid = 0, qtdInternadoMorreu = 0, qtdConfirmados = 0, mortes = 0;
     float porcentagemInternadas = 0.0, porcentagemMorreram = 0.0, porcentagemInternadasMorreram = 0.0;
 
-    for(nLinha = 1; nLinha <= maxLinhas; nLinha++){
-        if(strcmp(comando, "TODAS") == 0){
-        
-            if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0){
-                qtdInternado++;
-            }
+    if(strcmp(comando, "TODAS") == 0){
+        for(nLinha = 1; nLinha <= maxLinhas; nLinha++){
             
-            if(DCD[nLinha].DataObitoAno != 0){
-                qtdMorreram++;
+            if(strcmp(DCD[nLinha].Classificacao, "Confirmados") == 0){
+                qtdConfirmados++;
+                if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0){
+                    qtdInternadoComCovid++;
+                }
+                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0){
+                    qtdMorreramComCovid++;
+                }
+            
             }
-        }   
+
+            if(DCD[nLinha].DataObitoAno != 0){
+                mortes++;
+                if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0){
+                    qtdInternadoMorreu++;
+                }
+            }
+        }    
     }
-    porcentagemInternadas =  ((float) qtdInternado/(float) nLinha) * 100.0;
-    porcentagemMorreram =  ((float) qtdMorreram/(float) nLinha) * 100.0;
+
+    porcentagemInternadas =  ((float) qtdInternadoComCovid/(float) qtdConfirmados) * 100.0;
+    porcentagemMorreram =  ((float) qtdMorreramComCovid/(float) qtdConfirmados) * 100.0;
+    porcentagemInternadasMorreram =  ((float) qtdInternadoMorreu/(float) mortes) * 100.0;
+
     printf("%.3f\n", porcentagemInternadas);
     printf("%.3f\n", porcentagemMorreram);
-    printf("%d\n", qtdInternado);
-    printf("%d\n", qtdMorreram);
-    printf("%d",nLinha);
+    printf("%.3f\n", porcentagemInternadasMorreram);
+    printf("INTERNADOS: %d\n", qtdInternadoComCovid);
+    printf("CONFIRMADOS QUE MORRERAM: %d\n", qtdMorreramComCovid);
+    printf("CONFIRMADOS: %d\n", qtdConfirmados);
+    printf("MORRERAM: %d\n", mortes);
 }
