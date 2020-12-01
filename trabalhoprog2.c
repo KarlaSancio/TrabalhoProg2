@@ -63,10 +63,10 @@ int main()
 {
 
     LeArquivo();
-    // ListaCasosPorMunicipio();
+    ListaCasosPorMunicipio();
     TransformaDatas();
     //QtdCasosEntreDatas();
-    Porcentagens();
+    // Porcentagens();
     
     return 0;
 }
@@ -114,7 +114,9 @@ void TransformaDatas()// Filtro de datas
 void ListaCasosPorMunicipio()// Lista em ordem alfabetica cidades com mais de N casos
 {
 
-    int i=0,j=0,k=0;
+    int i=0, j=0, k=0, N;
+
+    scanf("%d",&N);
 
     // preenche lista vazia
     for (i = 0; i < qtdMunicipiosES; i++)
@@ -124,8 +126,8 @@ void ListaCasosPorMunicipio()// Lista em ordem alfabetica cidades com mais de N 
         CasosPorMunicipio[i].vetorNulo = 0;
     }
 
-    //preenche lista com tds municipios
-   for (i = 1; i <= maxLinhas; i++)
+    
+    for (i = 1; i <= maxLinhas; i++)//preenche lista com tds municipios
    {
         int jaExiste = 0;
         for (j = 0; j < qtdMunicipiosES; j++)
@@ -142,25 +144,44 @@ void ListaCasosPorMunicipio()// Lista em ordem alfabetica cidades com mais de N 
             }
         }
     }
-    // conta casos das cidades
-    for (i = 1; i <= maxLinhas; i++)
+    for (i = 1; i <= maxLinhas; i++)// conta casos das cidades
     {
-        if(DCD[i].Classificacao[0]=='C')
+        if(strcmp(DCD[i].Classificacao,"Confirmados") == 0)
         {     
             for (j = 0; j < qtdMunicipiosES; j++)
             {
-                if (strcmp(DCD[i].Municipio, CasosPorMunicipio[j].Nome)==0)
+                if (strcmp(DCD[i].Municipio, CasosPorMunicipio[j].Nome) == 0)
                 {
                     CasosPorMunicipio[j].Casos++;
-                    break;
                 }
             }
         }
     }
-
-    for ( i = 0; i < qtdMunicipiosES; i++)
+    char temporario[30];
+    int casosTemporario;
+    for (i = 0; i < qtdMunicipiosES-1; i++)//Bubble Sort
     {
-        printf("%s-%d\n",CasosPorMunicipio[i].Nome,CasosPorMunicipio[i].Casos);
+        for (j = i+1; j < qtdMunicipiosES; j++)
+        {
+            if (strcmp(CasosPorMunicipio[i].Nome,CasosPorMunicipio[j].Nome) > 0)
+            {
+                //copia os nomes dos municipios 
+                strcpy(temporario,CasosPorMunicipio[i].Nome);
+                strcpy(CasosPorMunicipio[i].Nome,CasosPorMunicipio[j].Nome);
+                strcpy(CasosPorMunicipio[j].Nome,temporario);
+                //copia os valores de casos
+                casosTemporario = CasosPorMunicipio[i].Casos;
+                CasosPorMunicipio[i].Casos = CasosPorMunicipio[j].Casos;
+                CasosPorMunicipio[j].Casos = casosTemporario;
+            }
+            
+        }
+        
+    }
+    for (i = 0; i < qtdMunicipiosES; i++)// imprime cidades acima de N
+    {
+        if(CasosPorMunicipio[i].Casos >= N)
+        printf("- %s: %d casos\n",CasosPorMunicipio[i].Nome,CasosPorMunicipio[i].Casos);
     }
 }
 
@@ -228,8 +249,17 @@ int NumeroDeDias(int N)// padroniza o final dos meses
 void Porcentagens()// determina % de internados, e mortes decorrentes das internacoes
 {
     char comando[30];
+    int i = 0;
 
     scanf("%s", comando);
+
+    for(i = 0; i <= strlen(comando); i++)
+    {
+      if(comando[i] >= 'a' && comando[i] <= 'z')
+      {
+        comando[i] = comando[i] - 32;
+      }
+    }
 
     int nLinha, qtdInternadoComCovid = 0, qtdMorreramComCovid = 0, qtdInternadoMorreu = 0, qtdConfirmados = 0, mortes = 0;
     float porcentagemInternadas = 0.0, porcentagemMorreram = 0.0, porcentagemInternadasMorreram = 0.0;
@@ -262,12 +292,74 @@ void Porcentagens()// determina % de internados, e mortes decorrentes das intern
         }    
     }
 
+    else{
+        for(nLinha = 1; nLinha <= maxLinhas; nLinha++)
+        { 
+            if(strcmp(DCD[nLinha].Classificacao, "Confirmados") == 0 && strcmp(DCD[nLinha].Municipio, comando) == 0)
+            {
+                qtdConfirmados++;
+                if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0)
+                {
+                    qtdInternadoComCovid++;
+                }
+                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0)
+                {
+                    qtdMorreramComCovid++;
+                }
+
+                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0)
+                {
+                    mortes++;
+                    if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0)
+                    {
+                        qtdInternadoMorreu++;
+                    }
+                }
+            }
+        } 
+    }
+
     porcentagemInternadas =  ((float) qtdInternadoComCovid/(float) qtdConfirmados) * 100.0;
     porcentagemMorreram =  ((float) qtdMorreramComCovid/(float) qtdConfirmados) * 100.0;
     porcentagemInternadasMorreram =  ((float) qtdInternadoMorreu/(float) mortes) * 100.0;
 
-    printf("%.3f\n", porcentagemInternadas);
-    printf("%.3f\n", porcentagemMorreram);
-    printf("%.3f\n", porcentagemInternadasMorreram);
+    printf("A %c de pessoas com Covid-19 que ficaram internadas: %.3f%c\n", '%', porcentagemInternadas, '%');
+    printf("A %c de pessoas com Covid-19 que morreram: %.3f%c\n", '%', porcentagemMorreram, '%');
+    printf("A %c de pessoas que ficaram internadas e morreram: %.3f%c\n",'%', porcentagemInternadasMorreram, '%');
     
+}
+
+void ListaTopN(){
+    int N;
+    tData dataInicio;
+    tData dataFinal;
+    int contaCasos = 0;
+
+    scanf("%s %s", d1, d2);
+
+    dataInicio = FiltroDeDatas(d1);
+    dataFinal = FiltroDeDatas(d2);
+
+    for(int nLinha = 1; nLinha <= maxLinhas; nLinha++)
+    {
+        int dia = dataInicio.dia;
+        for(int mes = dataInicio.mes; mes <= dataFinal.mes; mes++)
+        {
+            int maxDia = NumeroDeDias(mes);
+            if(mes == dataFinal.mes)
+            {
+                maxDia = dataFinal.dia;
+            }
+            while (dia <= maxDia)
+            {
+                if(DCD[nLinha].DataCadastroMes == mes && DCD[nLinha].DataCadastroDia == dia && DCD[nLinha].Classificacao[0] == 'C')
+                {
+                    contaCasos++;
+                }
+                dia++;
+            }
+            dia = 1;            
+        }
+    }
+    printf("%d\n", contaCasos);
 }
