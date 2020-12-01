@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
+#include <math.h>
 
 // #define maxLinhas 20
 #define maxLinhas 202363
@@ -58,15 +58,19 @@ void QtdCasosEntreDatas();
 tData FiltroDeDatas(char data[]);
 int NumeroDeDias(int N);
 void Porcentagens();
+void ListaTopN();
+void MediaIdade();
 
 int main()
 {
 
     LeArquivo();
-    ListaCasosPorMunicipio();
+    // ListaCasosPorMunicipio();
     TransformaDatas();
     //QtdCasosEntreDatas();
     // Porcentagens();
+    // ListaTopN();
+    MediaIdade();
     
     return 0;
 }
@@ -114,21 +118,19 @@ void TransformaDatas()// Filtro de datas
 void ListaCasosPorMunicipio()// Lista em ordem alfabetica cidades com mais de N casos
 {
 
-    int i=0, j=0, k=0, N;
+    int i=0, j=0, N;
 
     scanf("%d",&N);
 
-    // preenche lista vazia
-    for (i = 0; i < qtdMunicipiosES; i++)
+    for (i = 0; i < qtdMunicipiosES; i++)// preenche lista vazia
     {
         strcpy(CasosPorMunicipio[i].Nome, "\0");
         CasosPorMunicipio[i].Casos = 0;
         CasosPorMunicipio[i].vetorNulo = 0;
     }
-
     
     for (i = 1; i <= maxLinhas; i++)//preenche lista com tds municipios
-   {
+    {
         int jaExiste = 0;
         for (j = 0; j < qtdMunicipiosES; j++)
         {
@@ -218,7 +220,7 @@ void QtdCasosEntreDatas()// informa a qtd de casos entre duas datas, d1 e d2
             dia = 1;            
         }
     }
-    printf("%d\n", contaCasos);
+    printf("Total de pessoas: %d\n", contaCasos);
 }
 
 tData FiltroDeDatas(char data[])// transforma datas em informacao comparavel
@@ -329,18 +331,44 @@ void Porcentagens()// determina % de internados, e mortes decorrentes das intern
     
 }
 
-void ListaTopN(){
-    int N;
-    tData dataInicio;
-    tData dataFinal;
-    int contaCasos = 0;
+void ListaTopN(){// lista top de N casos entre as datas informadas
+    int N, i, j, casosTemporario = 0;
+    char d1[11], d2[11], temporario[30];
+    tData dataInicio, dataFinal;
 
+
+    scanf("%d",&N);
     scanf("%s %s", d1, d2);
 
     dataInicio = FiltroDeDatas(d1);
     dataFinal = FiltroDeDatas(d2);
+ 
+    for (i = 0; i < qtdMunicipiosES; i++)// preenche lista vazia
+    {
+        strcpy(CasosPorMunicipio[i].Nome, "\0");
+        CasosPorMunicipio[i].Casos = 0;
+        CasosPorMunicipio[i].vetorNulo = 0;
+    }
 
-    for(int nLinha = 1; nLinha <= maxLinhas; nLinha++)
+    for (i = 1; i <= maxLinhas; i++)//preenche lista com tds municipios
+    {
+        int jaExiste = 0;
+        for (j = 0; j < qtdMunicipiosES; j++)
+        {
+            if(strcmp(CasosPorMunicipio[j].Nome, DCD[i].Municipio) == 0)
+            {
+                jaExiste = 1;
+            }
+            if(CasosPorMunicipio[j].vetorNulo == 0 && jaExiste == 0)
+            {
+               strcpy(CasosPorMunicipio[j].Nome, DCD[i].Municipio); 
+               CasosPorMunicipio[j].vetorNulo++; 
+               break;
+            }
+        }
+    }
+
+    for(int nLinha = 1; nLinha <= maxLinhas; nLinha++)//contador de casos com base nas datas
     {
         int dia = dataInicio.dia;
         for(int mes = dataInicio.mes; mes <= dataFinal.mes; mes++)
@@ -354,12 +382,128 @@ void ListaTopN(){
             {
                 if(DCD[nLinha].DataCadastroMes == mes && DCD[nLinha].DataCadastroDia == dia && DCD[nLinha].Classificacao[0] == 'C')
                 {
-                    contaCasos++;
+                    for ( i = 0; i < qtdMunicipiosES; i++)
+                    {
+                        if (strcmp(DCD[nLinha].Municipio,CasosPorMunicipio[i].Nome) == 0)
+                        {
+                            CasosPorMunicipio[i].Casos++;
+                        }
+                    }
                 }
                 dia++;
             }
             dia = 1;            
         }
     }
-    printf("%d\n", contaCasos);
+
+    for (i = 0; i < qtdMunicipiosES-1; i++)// bubble sort para por em ordem decrescente
+    {
+        for (j = 0; j < qtdMunicipiosES; j++)
+        {
+            if( CasosPorMunicipio[i].Casos > CasosPorMunicipio[j].Casos)
+            {
+                casosTemporario = CasosPorMunicipio[i].Casos;
+                CasosPorMunicipio[i].Casos = CasosPorMunicipio[j].Casos;
+                CasosPorMunicipio[j].Casos = casosTemporario;
+
+                strcpy(temporario,CasosPorMunicipio[i].Nome);
+                strcpy(CasosPorMunicipio[i].Nome,CasosPorMunicipio[j].Nome);
+                strcpy(CasosPorMunicipio[j].Nome,temporario);
+            }
+        }
+        
+    }
+    
+    for ( i = 0; i < N; i++)//printa os casos em ordem ate o N
+    {
+        printf("%s: %d casos\n",CasosPorMunicipio[i].Nome ,CasosPorMunicipio[i].Casos);
+    }
+     
+}
+
+void MediaIdade(){
+
+    tData Idade[maxLinhas];
+    int i, morreram = 0, qtdSemComorbidades = 0;
+    char d1[11], d2[11];
+    long double soma = 0.0, desvioPadrao = 0.0, media = 0.0, porcentagemMortesSemComorbidades = 0.0, variancia = 0.0;
+    tData dataInicio;
+    tData dataFinal;
+
+    scanf("%s %s", d1, d2);
+
+    dataInicio = FiltroDeDatas(d1);
+    dataFinal = FiltroDeDatas(d2);
+
+    for ( i = 1; i <= maxLinhas; i++)
+    {
+        sscanf(DCD[i].IdadeNaDataNotificacao,"%d anos,%d meses, %d dias",&Idade[i].ano,&Idade[i].mes,&Idade[i].dia);
+    }
+
+    for(int nLinha = 1; nLinha <= maxLinhas; nLinha++)
+    {
+        int dia = dataInicio.dia;
+        for(int mes = dataInicio.mes; mes <= dataFinal.mes; mes++)
+        {
+            int maxDia = NumeroDeDias(mes);
+            if(mes == dataFinal.mes)
+            {
+                maxDia = dataFinal.dia;
+            }
+            while (dia <= maxDia)
+            {
+                if(DCD[nLinha].DataCadastroMes == mes && 
+                DCD[nLinha].DataCadastroDia == dia && 
+                strcmp(DCD[nLinha].Classificacao, "Confirmados") == 0)
+                {
+                    if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0 )
+                    {
+                        morreram++;
+                        if(strcmp(DCD[nLinha].ComorbidadePulmao, "Sim") != 0 && strcmp(DCD[nLinha].ComorbidadeCardio, "Sim") != 0 &&
+                            strcmp(DCD[nLinha].ComorbidadeRenal, "Sim") != 0 && strcmp(DCD[nLinha].ComorbidadeDiabetes, "Sim") != 0 &&
+                            strcmp(DCD[nLinha].ComorbidadeTabagismo, "Sim") != 0 && strcmp(DCD[nLinha].ComorbidadeObesidade, "Sim") != 0 )
+                        {
+                            qtdSemComorbidades++;
+                        }
+                        soma = soma + (long double) Idade[nLinha].ano;
+                    }
+                }
+                dia++;
+            }
+            dia = 1;            
+        }
+    }
+    
+    media = soma/(long double) morreram;// calcula a media 
+    porcentagemMortesSemComorbidades = ((long double) qtdSemComorbidades / (long double) morreram) * 100.0;
+
+    for(int nLinha = 1; nLinha <= maxLinhas; nLinha++)//contador apenas para o somatorio
+    {
+        int dia = dataInicio.dia;
+        for(int mes = dataInicio.mes; mes <= dataFinal.mes; mes++)
+        {
+            int maxDia = NumeroDeDias(mes);
+            if(mes == dataFinal.mes)
+            {
+                maxDia = dataFinal.dia;
+            }
+            while (dia <= maxDia)
+            {
+                if(DCD[nLinha].DataCadastroMes == mes && DCD[nLinha].DataCadastroDia == dia && strcmp(DCD[nLinha].Classificacao, "Confirmados") == 0)
+                {
+                    if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0 )
+                    {
+                        desvioPadrao += pow((long double) Idade[nLinha].ano - media, 2);
+                    }
+                }
+                dia++;
+            }
+            dia = 1;            
+        }
+    }
+    
+    variancia = desvioPadrao / (long double)(morreram-1);
+    
+    printf("A média e desvio padrão da idade: %.3Lf -- %.3lf\n", media, sqrt(variancia));
+    printf("A %c de pessoas que morreram sem comorbidade: %.3Lf%c\n",'%', porcentagemMortesSemComorbidades, '%');
 }
