@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 // #define maxLinhas 20
 #define maxLinhas 202363
@@ -53,24 +55,28 @@ tMun CasosPorMunicipio[qtdMunicipiosES];
 
 void LeArquivo();
 void TransformaDatas();
-void ListaCasosPorMunicipio();
-void QtdCasosEntreDatas();
+void ListaCasosPorMunicipio(char diretorio[]);
+void QtdCasosEntreDatas(char diretorio[]);
 tData FiltroDeDatas(char data[]);
 int NumeroDeDias(int N);
-void Porcentagens();
-void ListaTopN();
-void MediaIdade();
+void Porcentagens(char diretorio[]);
+void ListaTopN(char diretorio[]);
+void MediaIdade(char diretorio[]);
 
 int main()
 {
+    char  diretorio[40];
+    scanf("%s", diretorio);
+
+    mkdir(diretorio, 0777);
 
     LeArquivo();
-    // ListaCasosPorMunicipio();
     TransformaDatas();
-    //QtdCasosEntreDatas();
-    // Porcentagens();
-    // ListaTopN();
-    MediaIdade();
+    ListaCasosPorMunicipio(diretorio);
+    QtdCasosEntreDatas(diretorio);
+    ListaTopN(diretorio);
+    Porcentagens(diretorio);
+    MediaIdade(diretorio);
     
     return 0;
 }
@@ -115,10 +121,14 @@ void TransformaDatas()// Filtro de datas
 
 }
 
-void ListaCasosPorMunicipio()// Lista em ordem alfabetica cidades com mais de N casos
+void ListaCasosPorMunicipio(char diretorio[])// Lista em ordem alfabetica cidades com mais de N casos
 {
+    char diret[40];
+    strcpy(diret, diretorio);
 
     int i=0, j=0, N;
+    char temporario[30];
+    int casosTemporario;
 
     scanf("%d",&N);
 
@@ -159,8 +169,6 @@ void ListaCasosPorMunicipio()// Lista em ordem alfabetica cidades com mais de N 
             }
         }
     }
-    char temporario[30];
-    int casosTemporario;
     for (i = 0; i < qtdMunicipiosES-1; i++)//Bubble Sort
     {
         for (j = i+1; j < qtdMunicipiosES; j++)
@@ -180,15 +188,25 @@ void ListaCasosPorMunicipio()// Lista em ordem alfabetica cidades com mais de N 
         }
         
     }
+
+    strcat(diret, "item3.txt");
+    FILE *dir =  fopen(diret, "w");
+    
     for (i = 0; i < qtdMunicipiosES; i++)// imprime cidades acima de N
     {
         if(CasosPorMunicipio[i].Casos >= N)
-        printf("- %s: %d casos\n",CasosPorMunicipio[i].Nome,CasosPorMunicipio[i].Casos);
+        fprintf(dir,"- %s: %d casos\n",CasosPorMunicipio[i].Nome,CasosPorMunicipio[i].Casos);
     }
+
+
+    fclose(dir);
 }
 
-void QtdCasosEntreDatas()// informa a qtd de casos entre duas datas, d1 e d2
+void QtdCasosEntreDatas(char diretorio[])// informa a qtd de casos entre duas datas, d1 e d2
 {
+    char diret[40];
+    strcpy(diret, diretorio);
+
     char d1[11], d2[11];
     tData dataInicio;
     tData dataFinal;
@@ -220,7 +238,15 @@ void QtdCasosEntreDatas()// informa a qtd de casos entre duas datas, d1 e d2
             dia = 1;            
         }
     }
-    printf("Total de pessoas: %d\n", contaCasos);
+    // printf("Total de pessoas: %d\n", contaCasos);
+
+    strcat(diret, "item4.txt");
+    FILE *dir =  fopen(diret, "w");
+
+    fprintf(dir,"Total de pessoas: %d", contaCasos);
+
+    fclose(dir);
+
 }
 
 tData FiltroDeDatas(char data[])// transforma datas em informacao comparavel
@@ -248,90 +274,11 @@ int NumeroDeDias(int N)// padroniza o final dos meses
     }
 }
 
-void Porcentagens()// determina % de internados, e mortes decorrentes das internacoes
-{
-    char comando[30];
-    int i = 0;
+void ListaTopN(char diretorio[]){// lista top de N casos entre as datas informadas
 
-    scanf("%s", comando);
+    char diret[40];
+    strcpy(diret, diretorio);
 
-    for(i = 0; i <= strlen(comando); i++)
-    {
-      if(comando[i] >= 'a' && comando[i] <= 'z')
-      {
-        comando[i] = comando[i] - 32;
-      }
-    }
-
-    int nLinha, qtdInternadoComCovid = 0, qtdMorreramComCovid = 0, qtdInternadoMorreu = 0, qtdConfirmados = 0, mortes = 0;
-    float porcentagemInternadas = 0.0, porcentagemMorreram = 0.0, porcentagemInternadasMorreram = 0.0;
-
-    if(strcmp(comando, "TODAS") == 0)
-    {
-        for(nLinha = 1; nLinha <= maxLinhas; nLinha++)
-        { 
-            if(strcmp(DCD[nLinha].Classificacao, "Confirmados") == 0)
-            {
-                qtdConfirmados++;
-                if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0)
-                {
-                    qtdInternadoComCovid++;
-                }
-                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0)
-                {
-                    qtdMorreramComCovid++;
-                }
-
-                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0)
-                {
-                    mortes++;
-                    if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0)
-                    {
-                        qtdInternadoMorreu++;
-                    }
-                }
-            }
-        }    
-    }
-
-    else{
-        for(nLinha = 1; nLinha <= maxLinhas; nLinha++)
-        { 
-            if(strcmp(DCD[nLinha].Classificacao, "Confirmados") == 0 && strcmp(DCD[nLinha].Municipio, comando) == 0)
-            {
-                qtdConfirmados++;
-                if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0)
-                {
-                    qtdInternadoComCovid++;
-                }
-                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0)
-                {
-                    qtdMorreramComCovid++;
-                }
-
-                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0)
-                {
-                    mortes++;
-                    if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0)
-                    {
-                        qtdInternadoMorreu++;
-                    }
-                }
-            }
-        } 
-    }
-
-    porcentagemInternadas =  ((float) qtdInternadoComCovid/(float) qtdConfirmados) * 100.0;
-    porcentagemMorreram =  ((float) qtdMorreramComCovid/(float) qtdConfirmados) * 100.0;
-    porcentagemInternadasMorreram =  ((float) qtdInternadoMorreu/(float) mortes) * 100.0;
-
-    printf("A %c de pessoas com Covid-19 que ficaram internadas: %.3f%c\n", '%', porcentagemInternadas, '%');
-    printf("A %c de pessoas com Covid-19 que morreram: %.3f%c\n", '%', porcentagemMorreram, '%');
-    printf("A %c de pessoas que ficaram internadas e morreram: %.3f%c\n",'%', porcentagemInternadasMorreram, '%');
-    
-}
-
-void ListaTopN(){// lista top de N casos entre as datas informadas
     int N, i, j, casosTemporario = 0;
     char d1[11], d2[11], temporario[30];
     tData dataInicio, dataFinal;
@@ -414,14 +361,120 @@ void ListaTopN(){// lista top de N casos entre as datas informadas
         
     }
     
+    strcat(diret, "item5.txt");
+    FILE *dir =  fopen(diret, "w");
+
     for ( i = 0; i < N; i++)//printa os casos em ordem ate o N
     {
-        printf("%s: %d casos\n",CasosPorMunicipio[i].Nome ,CasosPorMunicipio[i].Casos);
+        fprintf(dir,"%s: %d casos\n",CasosPorMunicipio[i].Nome ,CasosPorMunicipio[i].Casos);
     }
-     
+    
+    fclose(dir);
 }
 
-void MediaIdade(){
+void Porcentagens(char diretorio[])// determina % de internados, e mortes decorrentes das internacoes
+{
+    char diret[40];
+    strcpy(diret, diretorio);
+
+    char comando[30];
+    int i = 0;
+    int eCidade = 0;
+
+    scanf("%s", comando);
+
+    for(i = 0; i <= strlen(comando); i++)
+    {
+      if(comando[i] >= 'a' && comando[i] <= 'z')
+      {
+        comando[i] = comando[i] - 32;
+      }
+    }
+
+    int nLinha, qtdInternadoComCovid = 0, qtdMorreramComCovid = 0, qtdInternadoMorreu = 0, qtdConfirmados = 0, mortes = 0;
+    float porcentagemInternadas = 0.0, porcentagemMorreram = 0.0, porcentagemInternadasMorreram = 0.0;
+
+    if(strcmp(comando, "TODAS") == 0)
+    {
+        for(nLinha = 1; nLinha <= maxLinhas; nLinha++)
+        { 
+            if(strcmp(DCD[nLinha].Classificacao, "Confirmados") == 0)
+            {
+                qtdConfirmados++;
+                if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0)
+                {
+                    qtdInternadoComCovid++;
+                }
+                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0)
+                {
+                    qtdMorreramComCovid++;
+                }
+
+                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0)
+                {
+                    mortes++;
+                    if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0)
+                    {
+                        qtdInternadoMorreu++;
+                    }
+                }
+            }
+        }    
+    }
+
+    else{
+        eCidade++;
+        for(nLinha = 1; nLinha <= maxLinhas; nLinha++)
+        { 
+            if(strcmp(DCD[nLinha].Classificacao, "Confirmados") == 0 && strcmp(DCD[nLinha].Municipio, comando) == 0)
+            {
+                qtdConfirmados++;
+                if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0)
+                {
+                    qtdInternadoComCovid++;
+                }
+                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0)
+                {
+                    qtdMorreramComCovid++;
+                }
+
+                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0)
+                {
+                    mortes++;
+                    if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0)
+                    {
+                        qtdInternadoMorreu++;
+                    }
+                }
+            }
+        } 
+    }
+
+    porcentagemInternadas =  ((float) qtdInternadoComCovid/(float) qtdConfirmados) * 100.0;
+    porcentagemMorreram =  ((float) qtdMorreramComCovid/(float) qtdConfirmados) * 100.0;
+    porcentagemInternadasMorreram =  ((float) qtdInternadoMorreu/(float) mortes) * 100.0;
+
+    strcat(diret, "item6.txt");
+    FILE *dir =  fopen(diret, "w");
+
+
+    if (eCidade != 0)
+    {
+        fprintf(dir,"- Resultados para %s:\n",comando);
+    }
+    
+    fprintf(dir,"A %c de pessoas com Covid-19 que ficaram internadas: %.3f%c\n", '%', porcentagemInternadas, '%');
+    fprintf(dir,"A %c de pessoas com Covid-19 que morreram: %.3f%c\n", '%', porcentagemMorreram, '%');
+    fprintf(dir,"A %c de pessoas que ficaram internadas e morreram: %.3f%c",'%', porcentagemInternadasMorreram, '%');
+
+
+    fclose(dir);
+    
+}
+
+void MediaIdade(char diretorio[]){// calcula media de idade dos mortos, desvio padrao, e porcentagem de mortes sem comorbidades
+    char diret[40];
+    strcpy(diret, diretorio);
 
     tData Idade[maxLinhas];
     int i, morreram = 0, qtdSemComorbidades = 0;
@@ -503,7 +556,13 @@ void MediaIdade(){
     }
     
     variancia = desvioPadrao / (long double)(morreram-1);
-    
-    printf("A média e desvio padrão da idade: %.3Lf -- %.3lf\n", media, sqrt(variancia));
-    printf("A %c de pessoas que morreram sem comorbidade: %.3Lf%c\n",'%', porcentagemMortesSemComorbidades, '%');
+
+    strcat(diret, "item7.txt");
+    FILE *dir =  fopen(diret, "w");
+
+
+    fprintf(dir,"A media e desvio padrao da idade: %.3Lf -- %.3lf\n", media, sqrt(variancia));
+    fprintf(dir,"A %c de pessoas que morreram sem comorbidade: %.3Lf%c",'%', porcentagemMortesSemComorbidades, '%');
+
+    fclose(dir);
 }
