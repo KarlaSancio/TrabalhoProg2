@@ -196,7 +196,7 @@ void ListaCasosPorMunicipio(char diretorio[])// Lista em ordem alfabetica cidade
     
     for (i = 0; i < qtdMunicipiosES; i++)// imprime cidades acima de N
     {
-        if(CasosPorMunicipio[i].Casos >= N)
+        if(CasosPorMunicipio[i].Casos > N)
         fprintf(dir,"- %s: %d casos\n",CasosPorMunicipio[i].Nome,CasosPorMunicipio[i].Casos);
     }
 
@@ -246,7 +246,7 @@ void QtdCasosEntreDatas(char diretorio[])// informa a qtd de casos confirmados e
     strcat(diret, "item4.txt");
     FILE *dir =  fopen(diret, "w");
 
-    fprintf(dir,"Total de pessoas: %d", contaCasos); // print com o total de pessoas que tiveram covid nesse periodo
+    fprintf(dir,"- Total de pessoas: %d", contaCasos); // print com o total de pessoas que tiveram covid nesse periodo
 
     fclose(dir);
 
@@ -370,7 +370,7 @@ void ListaTopN(char diretorio[]){// lista top de N casos entre as datas informad
 
     for ( i = 0; i < N; i++)//printa os casos em ordem ate o N
     {
-        fprintf(dir,"%s: %d casos\n",CasosPorMunicipio[i].Nome ,CasosPorMunicipio[i].Casos);
+        fprintf(dir,"- %s: %d casos\n",CasosPorMunicipio[i].Nome ,CasosPorMunicipio[i].Casos);
     }
     
     fclose(dir);
@@ -383,7 +383,6 @@ void Porcentagens(char diretorio[])// determina % de internados, e mortes decorr
 
     char comando[30];
     int i = 0;
-    int eCidade = 0;
 
     scanf("%s", comando);
 
@@ -427,7 +426,6 @@ void Porcentagens(char diretorio[])// determina % de internados, e mortes decorr
     }
 
     else{
-        eCidade++;
         for(nLinha = 1; nLinha <= maxLinhas; nLinha++)// verifica nos casos de municipios especificos
         { 
             if(strcmp(DCD[nLinha].Classificacao, "Confirmados") == 0 && strcmp(DCD[nLinha].Municipio, comando) == 0)// conta apenas os casos confirmados do municipio correspondente
@@ -463,14 +461,13 @@ void Porcentagens(char diretorio[])// determina % de internados, e mortes decorr
     FILE *dir =  fopen(diret, "w");
 
 
-    if (eCidade != 0) // caso a entrada seja de um municipio especifico, ele imprime um cabecalho a mais indicando qual eh a cidade
-    {
-        fprintf(dir,"- Resultados para %s:\n",comando);
-    }
+   
+    fprintf(dir,"- Resultados para %s:\n",comando);
+    
     // impressao das porcentagens
-    fprintf(dir,"A %c de pessoas com Covid-19 que ficaram internadas: %.3f%c\n", '%', porcentagemInternadas, '%');
-    fprintf(dir,"A %c de pessoas com Covid-19 que morreram: %.3f%c\n", '%', porcentagemMorreram, '%');
-    fprintf(dir,"A %c de pessoas que ficaram internadas e morreram: %.3f%c",'%', porcentagemInternadasMorreram, '%');
+    fprintf(dir,"- A %c de pessoas com Covid-19 que ficaram internadas: %.3f%c\n", '%', porcentagemInternadas, '%');
+    fprintf(dir,"- A %c de pessoas com Covid-19 que morreram: %.3f%c\n", '%', porcentagemMorreram, '%');
+    fprintf(dir,"- A %c de pessoas que ficaram internadas e morreram: %.3f%c",'%', porcentagemInternadasMorreram, '%');
 
 
     fclose(dir);
