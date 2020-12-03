@@ -5,12 +5,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-// #define maxLinhas 20
+// define maximo de linhas e quantidade de muncipios
 #define maxLinhas 202363
-#define maxColunas 12
 #define qtdMunicipiosES 78
 
-typedef struct Municipio// "lista" ods municípios do ES
+typedef struct Municipio// "lista" dos municípios do ES
 {
     int Casos;
     char Nome[30];
@@ -53,14 +52,15 @@ typedef struct Data// struct para o filtro de data
 tDCD DCD[maxLinhas];
 tMun CasosPorMunicipio[qtdMunicipiosES];
 
+// declaracao das funcoes
 void LeArquivo();
 void TransformaDatas();
 void ListaCasosPorMunicipio(char diretorio[]);
 void QtdCasosEntreDatas(char diretorio[]);
 tData FiltroDeDatas(char data[]);
 int NumeroDeDias(int N);
-void Porcentagens(char diretorio[]);
 void ListaTopN(char diretorio[]);
+void Porcentagens(char diretorio[]);
 void MediaIdade(char diretorio[]);
 
 int main()
@@ -68,8 +68,9 @@ int main()
     char  diretorio[40];
     scanf("%s", diretorio);
 
-    mkdir(diretorio, 0777);
+    mkdir(diretorio, 0777);// Cria a pasta de teste, onde serao impressas as saidas dos itens de 3 a 7
 
+    // chamada das funcoes
     LeArquivo();
     TransformaDatas();
     ListaCasosPorMunicipio(diretorio);
@@ -103,17 +104,17 @@ void LeArquivo()// abre, le o arquivo em uma struct, e fecha o arquivo
     fclose(arquivo);
 }
 
-void TransformaDatas()// Filtro de datas
+void TransformaDatas()// Filtro de datas da struct principal
 { 
     int nLinha = 1;
-    while (nLinha <= maxLinhas)
+    while (nLinha <= maxLinhas)// armazenamento da data de cadastro (transforma em uma informacao comparavel)
     {
         sscanf(DCD[nLinha].DataCadastro, "%d-%d-%d",&DCD[nLinha].DataCadastroAno,&DCD[nLinha].DataCadastroMes,&DCD[nLinha].DataCadastroDia); 
         nLinha++;
     }
 
     nLinha = 1;
-    while (nLinha <= maxLinhas)
+    while (nLinha <= maxLinhas)// armazenamento da data de obito (transforma em uma informacao comparavel)
     {
         sscanf(DCD[nLinha].DataObito, "%d-%d-%d", &DCD[nLinha].DataObitoAno, &DCD[nLinha].DataObitoMes, &DCD[nLinha].DataObitoDia); 
         nLinha++;
@@ -130,7 +131,7 @@ void ListaCasosPorMunicipio(char diretorio[])// Lista em ordem alfabetica cidade
     char temporario[30];
     int casosTemporario;
 
-    scanf("%d",&N);
+    scanf("%d",&N);// leitura do minimo de casos pra entrar na lista 
 
     for (i = 0; i < qtdMunicipiosES; i++)// preenche lista vazia
     {
@@ -142,13 +143,13 @@ void ListaCasosPorMunicipio(char diretorio[])// Lista em ordem alfabetica cidade
     for (i = 1; i <= maxLinhas; i++)//preenche lista com tds municipios
     {
         int jaExiste = 0;
-        for (j = 0; j < qtdMunicipiosES; j++)
+        for (j = 0; j < qtdMunicipiosES; j++)// preenche os 78 municipios 
         {
-            if(strcmp(CasosPorMunicipio[j].Nome, DCD[i].Municipio) == 0)
+            if(strcmp(CasosPorMunicipio[j].Nome, DCD[i].Municipio) == 0) // verifica se a cidade ja esta na lista
             {
                 jaExiste = 1;
             }
-            if(CasosPorMunicipio[j].vetorNulo == 0 && jaExiste == 0)
+            if(CasosPorMunicipio[j].vetorNulo == 0 && jaExiste == 0) // se a cidade nao existe na lista, ela eh adicionada na lista
             {
                strcpy(CasosPorMunicipio[j].Nome, DCD[i].Municipio); 
                CasosPorMunicipio[j].vetorNulo++; 
@@ -158,9 +159,9 @@ void ListaCasosPorMunicipio(char diretorio[])// Lista em ordem alfabetica cidade
     }
     for (i = 1; i <= maxLinhas; i++)// conta casos das cidades
     {
-        if(strcmp(DCD[i].Classificacao,"Confirmados") == 0)
+        if(strcmp(DCD[i].Classificacao,"Confirmados") == 0) // verfica apenas os casos confirmados de covid
         {     
-            for (j = 0; j < qtdMunicipiosES; j++)
+            for (j = 0; j < qtdMunicipiosES; j++) // contar os casos no municipio correspondente
             {
                 if (strcmp(DCD[i].Municipio, CasosPorMunicipio[j].Nome) == 0)
                 {
@@ -189,6 +190,7 @@ void ListaCasosPorMunicipio(char diretorio[])// Lista em ordem alfabetica cidade
         
     }
 
+    // cria o arquivo com as saidas correspondentes ao item 3
     strcat(diret, "item3.txt");
     FILE *dir =  fopen(diret, "w");
     
@@ -202,7 +204,7 @@ void ListaCasosPorMunicipio(char diretorio[])// Lista em ordem alfabetica cidade
     fclose(dir);
 }
 
-void QtdCasosEntreDatas(char diretorio[])// informa a qtd de casos entre duas datas, d1 e d2
+void QtdCasosEntreDatas(char diretorio[])// informa a qtd de casos confirmados entre duas datas, d1 e d2
 {
     char diret[40];
     strcpy(diret, diretorio);
@@ -212,18 +214,19 @@ void QtdCasosEntreDatas(char diretorio[])// informa a qtd de casos entre duas da
     tData dataFinal;
     int contaCasos = 0;
 
-    scanf("%s %s", d1, d2);
+    scanf("%s %s", d1, d2); // leitura das datas
 
+    // transforma as datas em uma informacao comparavel
     dataInicio = FiltroDeDatas(d1);
     dataFinal = FiltroDeDatas(d2);
 
-    for(int nLinha = 1; nLinha <= maxLinhas; nLinha++)
+    for(int nLinha = 1; nLinha <= maxLinhas; nLinha++)// varredura das linhas
     {
-        int dia = dataInicio.dia;
-        for(int mes = dataInicio.mes; mes <= dataFinal.mes; mes++)
+        int dia = dataInicio.dia; // setando o comeco do dia
+        for(int mes = dataInicio.mes; mes <= dataFinal.mes; mes++) // varredura entra as datas a partir do mes inicial ate o final
         {
-            int maxDia = NumeroDeDias(mes);
-            if(mes == dataFinal.mes)
+            int maxDia = NumeroDeDias(mes);// verifica o ultimo dia do mes (30 ou 31)
+            if(mes == dataFinal.mes) // se o mes das duas entradas eh o mesmo, o valor maximo de dias eh o dia final do mes
             {
                 maxDia = dataFinal.dia;
             }
@@ -238,18 +241,18 @@ void QtdCasosEntreDatas(char diretorio[])// informa a qtd de casos entre duas da
             dia = 1;            
         }
     }
-    // printf("Total de pessoas: %d\n", contaCasos);
 
+    // cria o arquivo com as saidas correspondentes ao item 4
     strcat(diret, "item4.txt");
     FILE *dir =  fopen(diret, "w");
 
-    fprintf(dir,"Total de pessoas: %d", contaCasos);
+    fprintf(dir,"Total de pessoas: %d", contaCasos); // print com o total de pessoas que tiveram covid nesse periodo
 
     fclose(dir);
 
 }
 
-tData FiltroDeDatas(char data[])// transforma datas em informacao comparavel
+tData FiltroDeDatas(char data[])// transforma datas(do input) em informacao comparavel
 { 
     tData resData;
     sscanf(data, "%d-%d-%d", &resData.ano, &resData.mes, &resData.dia);
@@ -297,7 +300,7 @@ void ListaTopN(char diretorio[]){// lista top de N casos entre as datas informad
         CasosPorMunicipio[i].vetorNulo = 0;
     }
 
-    for (i = 1; i <= maxLinhas; i++)//preenche lista com tds municipios
+    for (i = 1; i <= maxLinhas; i++)//preenche lista com todos os municipios
     {
         int jaExiste = 0;
         for (j = 0; j < qtdMunicipiosES; j++)
@@ -361,6 +364,7 @@ void ListaTopN(char diretorio[]){// lista top de N casos entre as datas informad
         
     }
     
+    // cria o arquivo com as saidas correspondentes ao item 5
     strcat(diret, "item5.txt");
     FILE *dir =  fopen(diret, "w");
 
@@ -383,7 +387,7 @@ void Porcentagens(char diretorio[])// determina % de internados, e mortes decorr
 
     scanf("%s", comando);
 
-    for(i = 0; i <= strlen(comando); i++)
+    for(i = 0; i <= strlen(comando); i++) // transforma a string inteira em maiusculo para a entrada poder ser lida sem importar como ela foi passada no input
     {
       if(comando[i] >= 'a' && comando[i] <= 'z')
       {
@@ -394,23 +398,23 @@ void Porcentagens(char diretorio[])// determina % de internados, e mortes decorr
     int nLinha, qtdInternadoComCovid = 0, qtdMorreramComCovid = 0, qtdInternadoMorreu = 0, qtdConfirmados = 0, mortes = 0;
     float porcentagemInternadas = 0.0, porcentagemMorreram = 0.0, porcentagemInternadasMorreram = 0.0;
 
-    if(strcmp(comando, "TODAS") == 0)
+    if(strcmp(comando, "TODAS") == 0)// verifica se forem todos os municipios
     {
         for(nLinha = 1; nLinha <= maxLinhas; nLinha++)
         { 
-            if(strcmp(DCD[nLinha].Classificacao, "Confirmados") == 0)
+            if(strcmp(DCD[nLinha].Classificacao, "Confirmados") == 0) // conta apenas os casos confirmados
             {
                 qtdConfirmados++;
-                if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0)
+                if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0) // conta apenas se o individuo ficou internado
                 {
                     qtdInternadoComCovid++;
                 }
-                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0)
+                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0)// conta a quantidade de mortos por covid
                 {
                     qtdMorreramComCovid++;
                 }
 
-                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0)
+                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0)// conta a quantidade de mortos que ficaram internados
                 {
                     mortes++;
                     if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0)
@@ -424,21 +428,21 @@ void Porcentagens(char diretorio[])// determina % de internados, e mortes decorr
 
     else{
         eCidade++;
-        for(nLinha = 1; nLinha <= maxLinhas; nLinha++)
+        for(nLinha = 1; nLinha <= maxLinhas; nLinha++)// verifica nos casos de municipios especificos
         { 
-            if(strcmp(DCD[nLinha].Classificacao, "Confirmados") == 0 && strcmp(DCD[nLinha].Municipio, comando) == 0)
+            if(strcmp(DCD[nLinha].Classificacao, "Confirmados") == 0 && strcmp(DCD[nLinha].Municipio, comando) == 0)// conta apenas os casos confirmados do municipio correspondente
             {
                 qtdConfirmados++;
-                if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0)
+                if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0)// conta apenas se o individuo ficou internado
                 {
                     qtdInternadoComCovid++;
                 }
-                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0)
+                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0)// conta a quantidade de mortos por covid
                 {
                     qtdMorreramComCovid++;
                 }
 
-                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0)
+                if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0)// conta a quantidade de mortos que ficaram internados
                 {
                     mortes++;
                     if(strcmp(DCD[nLinha].FicouInternado, "Sim") == 0)
@@ -454,15 +458,16 @@ void Porcentagens(char diretorio[])// determina % de internados, e mortes decorr
     porcentagemMorreram =  ((float) qtdMorreramComCovid/(float) qtdConfirmados) * 100.0;
     porcentagemInternadasMorreram =  ((float) qtdInternadoMorreu/(float) mortes) * 100.0;
 
+    // cria o arquivo com as saidas correspondentes ao item 6
     strcat(diret, "item6.txt");
     FILE *dir =  fopen(diret, "w");
 
 
-    if (eCidade != 0)
+    if (eCidade != 0) // caso a entrada seja de um municipio especifico, ele imprime um cabecalho a mais indicando qual eh a cidade
     {
         fprintf(dir,"- Resultados para %s:\n",comando);
     }
-    
+    // impressao das porcentagens
     fprintf(dir,"A %c de pessoas com Covid-19 que ficaram internadas: %.3f%c\n", '%', porcentagemInternadas, '%');
     fprintf(dir,"A %c de pessoas com Covid-19 que morreram: %.3f%c\n", '%', porcentagemMorreram, '%');
     fprintf(dir,"A %c de pessoas que ficaram internadas e morreram: %.3f%c",'%', porcentagemInternadasMorreram, '%');
@@ -488,7 +493,7 @@ void MediaIdade(char diretorio[]){// calcula media de idade dos mortos, desvio p
     dataInicio = FiltroDeDatas(d1);
     dataFinal = FiltroDeDatas(d2);
 
-    for ( i = 1; i <= maxLinhas; i++)
+    for ( i = 1; i <= maxLinhas; i++)// separa a idade em dia, mes e ano, pra poder comparar
     {
         sscanf(DCD[i].IdadeNaDataNotificacao,"%d anos,%d meses, %d dias",&Idade[i].ano,&Idade[i].mes,&Idade[i].dia);
     }
@@ -507,18 +512,18 @@ void MediaIdade(char diretorio[]){// calcula media de idade dos mortos, desvio p
             {
                 if(DCD[nLinha].DataCadastroMes == mes && 
                 DCD[nLinha].DataCadastroDia == dia && 
-                strcmp(DCD[nLinha].Classificacao, "Confirmados") == 0)
+                strcmp(DCD[nLinha].Classificacao, "Confirmados") == 0) // verifica se eh confirmado
                 {
-                    if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0 )
+                    if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0 )// verifica se morreu
                     {
                         morreram++;
                         if(strcmp(DCD[nLinha].ComorbidadePulmao, "Sim") != 0 && strcmp(DCD[nLinha].ComorbidadeCardio, "Sim") != 0 &&
                             strcmp(DCD[nLinha].ComorbidadeRenal, "Sim") != 0 && strcmp(DCD[nLinha].ComorbidadeDiabetes, "Sim") != 0 &&
-                            strcmp(DCD[nLinha].ComorbidadeTabagismo, "Sim") != 0 && strcmp(DCD[nLinha].ComorbidadeObesidade, "Sim") != 0 )
+                            strcmp(DCD[nLinha].ComorbidadeTabagismo, "Sim") != 0 && strcmp(DCD[nLinha].ComorbidadeObesidade, "Sim") != 0 )// verifica se nao tem comorbidades
                         {
                             qtdSemComorbidades++;
                         }
-                        soma = soma + (long double) Idade[nLinha].ano;
+                        soma = soma + (long double) Idade[nLinha].ano; // soma das idades das pessoas que morreram de covid
                     }
                 }
                 dia++;
@@ -527,10 +532,10 @@ void MediaIdade(char diretorio[]){// calcula media de idade dos mortos, desvio p
         }
     }
     
-    media = soma/(long double) morreram;// calcula a media 
-    porcentagemMortesSemComorbidades = ((long double) qtdSemComorbidades / (long double) morreram) * 100.0;
+    media = soma/(long double) morreram;// calcula a media de idade das pessoas que morreram de covid
+    porcentagemMortesSemComorbidades = ((long double) qtdSemComorbidades / (long double) morreram) * 100.0; // calculo da porcentagem de pessoas que morreram de covid sem ter nenhuma comorbidade
 
-    for(int nLinha = 1; nLinha <= maxLinhas; nLinha++)//contador apenas para o somatorio
+    for(int nLinha = 1; nLinha <= maxLinhas; nLinha++)//contador apenas para o somatorio pro desvio padrao
     {
         int dia = dataInicio.dia;
         for(int mes = dataInicio.mes; mes <= dataFinal.mes; mes++)
@@ -544,9 +549,9 @@ void MediaIdade(char diretorio[]){// calcula media de idade dos mortos, desvio p
             {
                 if(DCD[nLinha].DataCadastroMes == mes && DCD[nLinha].DataCadastroDia == dia && strcmp(DCD[nLinha].Classificacao, "Confirmados") == 0)
                 {
-                    if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0 )
+                    if(strcmp(DCD[nLinha].DataObito, "0000-00-00") != 0 ) 
                     {
-                        desvioPadrao += pow((long double) Idade[nLinha].ano - media, 2);
+                        desvioPadrao += pow((long double) Idade[nLinha].ano - media, 2); // somatorio para o calculo do desvio padrao
                     }
                 }
                 dia++;
@@ -555,14 +560,15 @@ void MediaIdade(char diretorio[]){// calcula media de idade dos mortos, desvio p
         }
     }
     
-    variancia = desvioPadrao / (long double)(morreram-1);
+    variancia = desvioPadrao / (long double)(morreram-1); // calculo da variancia
 
+    // cria o arquivo com as saidas correspondentes ao item 7
     strcat(diret, "item7.txt");
     FILE *dir =  fopen(diret, "w");
 
 
-    fprintf(dir,"A media e desvio padrao da idade: %.3Lf -- %.3lf\n", media, sqrt(variancia));
-    fprintf(dir,"A %c de pessoas que morreram sem comorbidade: %.3Lf%c",'%', porcentagemMortesSemComorbidades, '%');
+    fprintf(dir,"A media e desvio padrao da idade: %.3Lf -- %.3lf\n", media, sqrt(variancia)); // print e calculo do desvio padrao e da media de idades
+    fprintf(dir,"A %c de pessoas que morreram sem comorbidade: %.3Lf%c",'%', porcentagemMortesSemComorbidades, '%'); // print da porcentagem de pessoas que morreram de covid sem nenhuma comorbidade
 
     fclose(dir);
 }
